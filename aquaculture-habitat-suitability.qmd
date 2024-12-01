@@ -1,0 +1,525 @@
+---
+title: "Marine Aquaculture Suitability by EEZ Zone on West Coast of the U.S."
+subtitle: "EDS 223 - Geospatial Analysis"
+author: "Nicole Pepper"
+date: last-modified
+execute: 
+  eval: true
+  warning: false
+  message: false
+format:
+  html:
+    toc: true 
+    code-fold: true
+editor_options: 
+  chunk_output_type: console
+
+---
+#### 1. Set up Workspace
+```{r}
+#| code-summary: "Load Libraries"
+
+# ---- Load libraries ----
+# Load libraries
+library(terra)
+library(geodata)
+library(tidyverse)
+library(tmap)
+library(kableExtra)
+library(spData)
+library(spDataLarge)
+library(here)
+library(viridisLite) 
+library(terra)
+library(sf)
+library(purrr)
+library(stars)
+library(raster)
+library(dplyr)
+library(testthat)
+library(tigris)
+```
+
+```{r}
+#| code-summary: "Read in Project Data"
+#| output: false
+
+# ---- Read in Project Data ----
+
+# Create data folder object
+data_folder <- here::here("data")
+
+# Read in sea surface temperature (sst) data & make mean
+sst_list <- list.files(data_folder,
+                       pattern = "average_annual_sst_\\d{4}\\.tif$",
+                       full.names = TRUE)
+sst_stack <- lapply(sst_list, rast) %>%
+  rast()
+
+# Read in depth data
+depth <- rast(here::here("data/depth.tif"))
+
+# Read in EEZ Zones
+eez_zones <- st_read(here::here("data/wc_regions_clean.shp"))
+
+
+# Get US state boundaries from tigris library
+states_sf <- tigris::states()
+
+# Filter selected states
+west_coast_states <- states_sf[states_sf$NAME %in% c("California", "Oregon", "Nevada", "Washington","Arizona","Idaho","Montana"), ] %>% st_transform(., st_crs(eez_zones))
+
+```
+
+#### 2. Prepare Data
+
+```{r}
+#| code-summary: "Prepare SST Data"
+
+# Calculate mean SST
+mean_sst <- mean(sst_stack)
+
+# Convert SST from Kelvin to Celsius
+mean_sst <- mean_sst - 273.15
+
+```
+
+```{r}
+#| code-summary: "Prepare Data CRS"
+
+# ---- Check CRS of data ----
+
+# Create a warning if the data do not match
+if (crs(depth) != crs(mean_sst)) {
+  warning("The raster datasets do not have the same CRS.")
+} else {
+  message("The raster datasets are in the same CRS.")
+}
+
+# ---- Resample raster data to match resolution and extent ----
+
+# Transform CRS
+eez_zones <- st_transform(eez_zones, crs = crs(mean_sst)) 
+
+# Resample depth data to match the resolution of SST with nearest neighbor
+depth <- resample(depth, mean_sst, method = "near")
+
+# Crop the resampled depth data to the extent of SST data
+depth <- crop(depth, mean_sst, snap = "near")
+
+# ---- Reproject depth to match mean_sst data ----
+
+# Reproject depth layer
+depth <- project(depth, crs(mean_sst))
+
+# Create a warning if the data do not match
+if (crs(depth) != crs(mean_sst)) {
+  warning("The raster datasets do not have the same CRS.")
+} else {
+  message("The raster datasets are in the same CRS.")
+}
+
+# Stack data
+data_stack <- c(depth, mean_sst)
+names(data_stack) <- c("depth", "mean_sst")
+
+```
+
+
+#### 3. Calculate Oyster Habitat Suitability by EEZ Zone
+```{r}
+#| code-summary: "Reclassify SST & Depth Values for Suitable Habitat"
+
+# ---- Assign suitable sst range ----
+  # Define matrix for reclassification of sst
+  sst <- matrix(c(-Inf, 11, 0,
+                  11, 30, 1,
+                  30, Inf, 0),
+                ncol = 3, byrow = TRUE)
+  sst_suitability <- terra::classify(data_stack[["mean_sst"]],
+                                       rcl = sst,
+                                       include.lowest = TRUE)
+
+      
+# ---- Assign suitable depth range ----
+
+  # Define matrix for reclassification of depth
+  depth <- matrix(c(-Inf, -70, 0,
+                        -70, 0, 1,
+                       0, Inf, 0),
+                       ncol = 3, byrow = TRUE)
+    
+  depth_suitability <- terra::classify(data_stack[["depth"]],
+                                         rcl = depth,
+                                         include.lowest = TRUE)
+
+
+```
+
+```{r}
+#| code-summary: "Calculate Suitability & Crop to EEZ Zone"
+
+# ---- Calculate Suitability ----
+
+  # Combine SST and depth suitability
+  species_suitability <- sst_suitability * depth_suitability
+    
+  # Separate unsuitable area, reclassify 1 to NA
+  species_unsuitable <- species_suitability
+  species_unsuitable[species_unsuitable == 1] <- NA 
+   
+  # Remove unsuitable area, reclassify 0 to NA
+  species_suitability[species_suitability == 0] <- NA
+  
+```
+
+```{r}
+#| code-summary: "Calculate Suitable Area By EEZ Zone"
+
+  # Mask species_suitability to eez zones
+  species_suitability <- mask(species_suitability, eez_zones)
+
+  # Create a raster where each cell is it's size (will be used to summarize area)
+  cell_area <- cellSize(species_suitability, unit = 'km')
+  
+  # Rasterize eez data by rgn field based on species_suitability resolution and extent
+  eez_raster <- rasterize(eez_zones, species_suitability, field= 'rgn')
+  
+  # Mask the eez_raster to the species_suitability area
+  eez_suitability <- mask(eez_raster, species_suitability)
+    # Calculate the area
+  eez_suitability_area <- zonal(cell_area, eez_suitability, fun = 'sum') %>%
+    rename(suitable_area_km2 = area)
+  
+  # Join area calcs with the eez_zone dataset
+  eez_suitability_area <- left_join(eez_zones, eez_suitability_area, by = 'rgn')  
+  
+  # Add column and sort by rank
+  eez_suitability_area <- eez_suitability_area %>%
+    mutate(rank = rank(-suitable_area_km2, ties.method = "min")) %>%
+    arrange(rank)
+```
+
+```{r}
+#| code-summary: "Visualize Preliminary Results"
+
+# Set up the plotting layout: 1 row, 3 columns
+par(mfrow = c(1, 3))
+
+# Plot depth_suitability
+plot(depth_suitability, main = "Depth Suitability")
+
+# Plot sst_suitability
+plot(sst_suitability, main = "SST Suitability")
+
+# Plot eez_suitability
+plot(eez_suitability, main = "EEZs Cropped to Suitable Areas")
+
+# Reset plotting layout
+par(mfrow = c(1, 1))
+
+```
+
+```{r}
+#| code-summary: "Map Oyster Habitat Suitability by EEZ Zone"
+
+# ---- Prepare labels for map ----
+
+  # Add new line for spaces in eez region labels
+  eez_suitability_area$rgn_label <- gsub(" ", "\n", eez_suitability_area$rgn)
+  
+  # Round area field to remove decimals and add scientific notation for area labels
+  eez_suitability_area$suitable_area_km_rounded <- paste(format(round(eez_suitability_area$suitable_area_km), big.mark = ",", scientific = FALSE), "km²")
+
+# ---- Create Suitability Map ----
+
+  # Add unsuitable area for ocean background
+  oyster_test_map <- tm_shape(species_unsuitable) + 
+    tm_raster(palette = "#124D5C",
+              legend.show = FALSE) +
+  # Add eez_zones ranked by habitat suitability
+  tm_shape(eez_suitability_area) +
+    tm_fill(col = "rank",
+            palette =  c("#00756D", "#00BFB2", "#6BCFC8", "#B2EFEF", "#CCFFFB"),
+            title = "Suitable Area (km²)\n By EEZ Zone",
+            border.alpha = 0.8,
+            legend.show = FALSE) +
+  # Add border color around EEZ zones boundaries 
+  tm_shape(eez_suitability_area) +
+    tm_borders(col = "#124D5C",
+               lwd = .25) +
+    
+  # Add state borders for background
+  tm_shape(west_coast_states) +
+  tm_borders(col = "white",
+             alpha = 0.1,
+             lwd = .25) +
+    
+  tm_shape(species_suitability) +
+  tm_raster(palette = "yellow",
+              labels = "Suitable Area",
+              title = '') + 
+  
+  # Add EEZ labels
+  tm_shape(eez_suitability_area) +  
+  tm_text("rgn_label",
+            size = 0.6,
+            col = "white",
+            shadow = TRUE,
+            fontface = "bold",
+            ymod = .5) + 
+    
+  # Add suitable area labels
+  tm_shape(eez_suitability_area) +
+  tm_text("suitable_area_km_rounded",
+            size = 0.7,
+            col = "yellow",
+            shadow = TRUE,
+            fontface = "bold",
+            ymod = -0.5) + 
+  
+  # Add tick marks 
+  tm_grid(lines = FALSE, tick = TRUE, alpha = 0.8, n.x = 5, n.y = 5) +
+  
+  # Add legend for suitable area by EEZ Zone
+  tm_add_legend(type = "fill", 
+                col = c("#00756D", "#00BFB2", "#6BCFC8", "#B2EFEF", "#CCFFFB"), 
+                labels = paste(eez_suitability_area$rank,eez_suitability_area$rgn_key), 
+                title = "Exclusive Economic Zones (EEZ)\nRanked by Suitable Habitat Area",
+                size = 1) +
+  # Add compass
+  tm_compass(type = "arrow",
+             size = 1,
+             position = c(0.1, 0.1),
+             color.dark = "#07222B",
+             color.light = "grey",
+             text.color = "grey",
+             text.size = .6) +
+    
+  # Format layout 
+  tm_layout(main.title = paste("U.S. West Coast\n Oyster Habitat Suitability"),
+              main.title.position = c("center", "top"),
+              legend.text.color = "white",
+              legend.position = c(0.55,0.45),
+              legend.title.color = "white",
+              legend.title.size = 1.2,
+              bg.color = '#07222B')
+
+
+```
+
+
+
+### 4. Generalize Workflow for Habitat Suitability
+
+#### Create a 'Choose-your-own species' function
+
+**About the function:** 
+
+Arguments:
+
+- `species`: a string containing the species name
+
+- `min_temp`: minimum suitable sea surface temperature in Celsius
+
+- `min_temp`:  maximum suitable sea surface temperature in Celsius
+
+- `min_depth`: minimum depth below sea level (0 = sea level)
+
+- `max_depth`: maximum depth below sea level 
+
+
+Outputs: Map of EEZ regions colored by amount of suitable area
+
+```{r}
+#| code-summary: "Create a Habitat Suitability Function"
+
+# ---- Create suitability function ----
+habitat_suitability_map <- function(species, min_sst, max_sst, min_depth, max_depth) {
+
+# ---- Assign suitable sst range ----
+  
+  # Define matrix for reclassification of sst
+  sst <- matrix(c(-Inf, min_sst, 0,
+                  min_sst, max_sst, 1,
+                  max_sst, Inf, 0),
+                ncol = 3, byrow = TRUE)
+  sst_suitability <- terra::classify(data_stack[["mean_sst"]],
+                                       rcl = sst,
+                                       include.lowest = TRUE)
+# ---- Assign suitable depth range ----
+  
+  # Define matrix for reclassification of depth
+  depth <- matrix(c(-Inf, max_depth, 0,
+                        max_depth, min_depth, 1,
+                       min_depth, Inf, 0),
+                       ncol = 3, byrow = TRUE)
+    
+  depth_suitability <- terra::classify(data_stack[["depth"]],
+                                      rcl = depth,
+                                      include.lowest = TRUE)
+
+# ---- Combine suitability ----
+
+  # Combine SST and depth suitability
+  species_suitability <- sst_suitability * depth_suitability
+    
+  # Separate unsuitable area, reclassify 1 to NA
+  species_unsuitable <- species_suitability
+  species_unsuitable[species_unsuitable == 1] <- NA 
+   
+  # Remove unsuitable area, reclassify 0 to NA
+  species_suitability[species_suitability == 0] <- NA
+   
+  # Mask species_suitability to eez zones
+  species_suitability <- mask(species_suitability, eez_zones)
+
+# ---- Calculate Suitable Area By EEZ Zones ----
+
+  # Create a raster where each cell is it's size (will be used to summarize area)
+  cell_area <- cellSize(species_suitability, unit = 'km')
+  
+  # Rasterize eez data by rgn field based on species_suitability resolution and extent
+  eez_raster <- rasterize(eez_zones, species_suitability, field= 'rgn')
+  
+  # Mask the eez_raster to the species_suitability area
+  eez_suitability <- mask(eez_raster, species_suitability)
+
+  # Calculate the area
+  eez_suitability_area <- zonal(cell_area, eez_suitability, fun = 'sum') %>%
+    rename(suitable_area_km2 = area)
+  
+  # Join area calcs with the eez_zone dataset
+  eez_suitability_area <- left_join(eez_zones, eez_suitability_area, by = 'rgn')  
+  
+  # Add column and sort by rank
+  eez_suitability_area <- eez_suitability_area %>%
+    mutate(rank = rank(-suitable_area_km2, ties.method = "min")) %>%
+    arrange(rank)
+
+# ---- Prepare labels for map ----
+
+  # Add new line for spaces in eez region labels
+  eez_suitability_area$rgn_label <- gsub(" ", "\n", eez_suitability_area$rgn)
+  
+  # Round area field to remove decimals and add scientific notation for area labels
+  eez_suitability_area$suitable_area_km_rounded <- paste(format(round(eez_suitability_area$suitable_area_km), big.mark = ",", scientific = FALSE), "km²")
+
+# ---- Create Suitability Map ----
+
+  # Add unsuitable area for ocean background
+  tm_shape(species_unsuitable) + 
+    tm_raster(palette = "#124D5C",
+              legend.show = FALSE) +
+  # Add eez_zones ranked by habitat suitability
+  tm_shape(eez_suitability_area) +
+    tm_fill(col = "rank",
+            palette =  c("#00756D", "#00BFB2", "#6BCFC8", "#B2EFEF", "#CCFFFB"),
+            title = "Suitable Area (km²)\n By EEZ Zone",
+            border.alpha = 0.8,
+            legend.show = FALSE) +
+  # Add border color around EEZ zones boundaries 
+  tm_shape(eez_suitability_area) +
+    tm_borders(col = "#124D5C",
+               lwd = .25) +
+    
+  # Add state borders for background
+  tm_shape(west_coast_states) +
+  tm_borders(col = "white",
+             alpha = 0.1,
+             lwd = .25) +
+    
+  tm_shape(species_suitability) +
+  tm_raster(palette = "yellow",
+              labels = "Suitable Area",
+              title = '') + 
+  
+  # Add EEZ labels
+  tm_shape(eez_suitability_area) +  
+  tm_text("rgn_label",
+            size = 0.6,
+            col = "white",
+            shadow = TRUE,
+            fontface = "bold",
+            ymod = .5) + 
+    
+  # Add suitable area labels
+  tm_shape(eez_suitability_area) +
+  tm_text("suitable_area_km_rounded",
+            size = 0.7,
+            col = "yellow",
+            shadow = TRUE,
+            fontface = "bold",
+            ymod = -0.5) + 
+  
+  # Add tick marks 
+  tm_grid(lines = FALSE, tick = TRUE, alpha = 0.8, n.x = 5, n.y = 5) +
+  
+  # Add legend for suitable area by EEZ Zone
+  tm_add_legend(type = "fill", 
+                col = c("#00756D", "#00BFB2", "#6BCFC8", "#B2EFEF", "#CCFFFB"), 
+                labels = paste(eez_suitability_area$rank,eez_suitability_area$rgn_key), 
+                title = "Exclusive Economic Zones (EEZ)\nRanked by Suitable Habitat Area",
+                size = 1) +
+  # Add compass
+  tm_compass(type = "arrow",
+             size = 1,
+             position = c(0.1, 0.07),
+             color.dark = "white",
+             color.light = "grey",
+             text.color = "grey",
+             text.size = .6) +
+    
+  # Format layout 
+  tm_layout(main.title = paste("U.S. West Coast\n",species, "Habitat Suitability"),
+              main.title.position = c("center", "top"),
+              legend.text.color = "white",
+              legend.position = c(0.55,0.45),
+              legend.title.color = "white",
+              legend.title.size = 1.2,
+              bg.color = '#07222B')
+}
+
+```
+
+#### 5. Use function with Test Species
+
+
+Table A.
+
+| Species | Min Temp | Max Depth | Min Depth |  Max Depth |
+|------------------|------------------|-------------------|------------------|------------------|
+|Oyster          | 10                       | 20                        | - 40               |  0               | 
+| Kelp          | 11                       | 30                         | -70                | 0               | 
+
+Source: [sealifebase.ca](https://www.sealifebase.ca/search.php)
+```{r}
+#| code-summary: "Calculate Oyster Habitat Suitability"
+
+habitat_suitability_map("Oyster", 11,30,0, -70)
+
+```
+*This map shows habitat suitability for oyster aquaculture along the U.S. West Coast. Suitable areas, highlighted in yellow, were calculated using thresholds for sea surface temperature and depth below sea level, based on their known range according to [sealifebase.ca](https://www.sealifebase.ca/search.php). The threshold values for oyster can be located above on Table A. The Exclusive Economic Zones (EEZ) regions are colored by the the amount of suitable area, where dark turquoise indicates the largest amount of area and light blue is the smallest. Central California ranked 1st on the list at 4,000 km² and Northern California ranked fifth, the lowest, at 178km².*
+
+```{r}
+#| code-summary: "Calculate Kelp Habitat Suitability"
+
+habitat_suitability_map("Kelp", 10,20,0,-40)
+```
+
+*This map shows habitat suitability for giant kelp aquaculture along the U.S. West Coast. Suitable areas, highlighted in yellow, were calculated using thresholds for sea surface temperature and depth below sea level, based on their known range according to [sealifebase.ca](https://www.sealifebase.ca/search.php). The threshold values for kelp can be located above on Table A. The Exclusive Economic Zones (EEZ) regions are colored by the the amount of suitable area, where dark turquoise indicates the largest amount of area and light blue is the smallest. Central California ranked 1st on the list at 4,000 km² and Northern California ranked fifth, the lowest, at 178km².*
+
+
+#### 6. Resources:
+
+**Habitat Suitability Ranges:**
+[sealifebase.ca](https://www.sealifebase.ca/search.php) Access date: 11/20/24
+
+**Exclusive Economic Zones (EEZ) Boundaries:**
+[Marine Regions](https://www.marineregions.org/eez.php) Access date: 11/20/24
+
+**Sea Surface Temperature**
+[NOAA’s 5km Daily Global Satellite Sea Surface Temperature Anomaly v3.1](https://coralreefwatch.noaa.gov/product/5km/index_5km_ssta.php) Access date: 11/20/24
+
+**Bathymetry:**
+[General Bathymetric Chart of the Oceans (GEBCO)](https://www.gebco.net/data_and_products/gridded_bathymetry_data/#area) Access date: 11/20/24
