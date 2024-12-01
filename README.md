@@ -1,44 +1,37 @@
 *UCSB MEDS* - *EDS 223 - Geospatial Analysis &amp; Remote Sensing*
 
 
-# Aquaculture Habitat Suitability Analysis
+# West Coast Aquaculture Habitat Suitability Analysis
+
+![R Programming](https://img.shields.io/badge/R_Programming-cornflowerblue?style=for-the-badge&logo=R) ![Remote Sensing](https://img.shields.io/badge/Remote_Sensing-green?style=for-the-badge) ![GIS](https://img.shields.io/badge/GIS-purple?style=for-the-badge)  ![UCSB MEDS](https://img.shields.io/badge/UCSB%20MEDS-blue?style=for-the-badge) 
 
 **Author:** Nicole Pepper
 
-**Link to github repo:** https://github.com/nicolelpepper/EDS223-aquaculture-habitat-suitability
+<div style="text-align: left;">
+  <img src="https://eds-223-geospatial.github.io/assignments/images/aquaculture.jpg" alt="Image" width="800">
 
- ![ Image](https://eds-223-geospatial.github.io/assignments/images/aquaculture.jpg)
+*Image by [Hanson Lu](https://unsplash.com/photos/aerial-photography-of-white-frames-on-top-of-water-eUfnha6ev9g)*
 
-Image by [Hanson Lu](https://unsplash.com/photos/aerial-photography-of-white-frames-on-top-of-water-eUfnha6ev9g)
+### About the Repo:
 
-### About the assignment:
+[This repository](https://github.com/nicolelpepper/EDS223-aquaculture-habitat-suitability) contains a R-Studio Quarto Markdown document of my analysis identifying the suitability of Exclusive Economic Zones (EEZs) along the U.S. West Coast for developing marine aquaculture using sea surface temperature (SST) and depth below sea level. For this analysis, I create a generalizable function that outputs a map showing EEZ regions colored by the amount of suitable area for aquaculture.
 
-For this project, I identify the best Exclusive Economic Zones (EEZs) along the U.S. West Coast for developing marine aquaculture using sea surface temperature (SST) and depth requirements to determine suitability. I create a generalizable function that outputs a map showing EEZ regions colored by the amount of suitable area for aquaculture:
+### Technical Highlights:
+- Combining vector/raster data
+- Resampling & masking raster data
+- Raster calculations for determining suitability
+- Creating a function for streamlined workflow
 
-**Technical Highlights:**
-- combining vector/raster data
-- resampling & masking raster data
-- raster calculations for determining suitability
-- creating a function for streamlined workflow
+### Data Descriptions:
 
-### About this repo:
-
-This repository contains a notebook `hwk4-task2-fire-perimeter-PEPPER.ipynb` that subsets the historic california fire boundary dataset to the Thomas Fire Boundary and a notebook `hwk4-task2-false-color-PEPPER.ipynb` exploring the burn scar for the 2017 Thomas Fire in Santa Barbara and Ventura Counties in California. For the assignment, I visualize a satellite image over the burn area in false color to highlight the burn scar and overlay it with the outline of the Thomas Fire burn perimeter.
-
-### Datasets descriptions:
-
-- The `thomas_fire.shp` is a shapefile containing the fire perimeter for the Thomas Fire in 2017. It is subset of a CAL FIRE dataset with historical boundaries for fires (including both natural and prescribed fires) in the state of California. The dataset has a good record of past large fires but is not complete and may be missing some fires. The thomas_fire.shp data is stored in `/data/thomas_fire` folder in the repo, I did not push the original full Cal Fire dataset to GitHub, it was accessed locally.
+- The `Average Annual Sea Surface Temperature` (SST) data is a collection of raster files containing the average annual SST for 2008 - 2012 along the U.S. West Coast. It is from NOAA’s 5km Daily Global Satellite Sea Surface Temperature Anomaly. The SST data is stored in `/data/` folder in the repo as `average_annual_sst_YEAR.tif`, I did not push the original full dataset to GitHub, it was accessed locally.
   
-- The `landsat.nc` dataset is an image from Landsat Collection 2 Level-2, from the Microsof Planetary Computer data catalogue. Landsat Collection 2 Level-2 Science Products consist of atmospherically corrected surface reflectance and surface temperature image data. Collection 2 Level-2 Science Products are available from August 22, 1982 to present. It is accessed through UCSB Workbench 1 `/courses/EDS220/data/hwk4_landsat_data landsat8-2018-01-26-sb-simplified.nc`. 
+- The `Depth` dataset is from General Bathymetric Chart of the Oceans (GEBCO). The SST data is stored in `/data/` folder in the repo as `depth.tif`, I did not push the original full dataset to GitHub, it was accessed locally.
 
-### References:
+- The `Exclusive Economic Zone (EEZ) Boundary` data is from Marine Regions.  The EEZ data is stored in `/data/` folder in the repo as `wc_regions_clean.shp`, I did not push the original full dataset to GitHub, it was accessed locally.
 
-CAL FIRE (2024) *California Fire Perimeters (all)* [Data file] Available from: https://catalog.data.gov/dataset/california-fire-perimeters-all-b3436 Access date: 11/20/24
-
-USGS (2024) *Landsat Collection 2 Level-2 Surface Reflectance and Surface Temperature Products* [Data file]. Available from: https://www.usgs.gov/landsat-missions/landsat-collection-2 Access date: 11/20/24
-
-Carmen Galaz García (2024) *UCSB MEDS - 220 - Working With Environmental Datasets * [Source of Homework Assignment]. Course Website: https://meds-eds-220.github.io/MEDS-eds-220-course/ Access date: 11/20/24
-
+- The `State Boundary` dataset is from TIGER/Line Shapefiles. R package `TIGRIS` version 1.5.0. https://CRAN.R-project.org/package=tigris.
+  
 ### Repo structure:
 
 ```
@@ -56,6 +49,19 @@ EDS223-HW3
     │   average_annual_sst_2011.tif
     │   average_annual_sst_2012.tif
 ```
+
+### References:
+
+- [sealifebase.ca](https://www.sealifebase.ca/search.php) *Access date: 11/20/24*
+
+- [Marine Regions](https://www.marineregions.org/eez.php) *Access date: 11/20/24*
+
+- [NOAA’s 5km Daily Global Satellite Sea Surface Temperature Anomaly v3.1](https://coralreefwatch.noaa.gov/product/5km/index_5km_ssta.php) *Access date: 11/20/24*
+
+- [General Bathymetric Chart of the Oceans (GEBCO)](https://www.gebco.net/data_and_products/gridded_bathymetry_data/#area) *Access date: 11/20/24*
+
+- [TIGER/Line Shapefiles version 1.5.0](https://CRAN.R-project.org/package=tigris) *Access date: 11/20/24*
+
 
 ### Acknowledgments:
 
