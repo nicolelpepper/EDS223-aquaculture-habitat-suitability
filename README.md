@@ -28,10 +28,9 @@
   
 - The `Depth` dataset is from General Bathymetric Chart of the Oceans (GEBCO). The SST data is stored in `/data/` folder in the repo as `depth.tif`, I did not push the original full dataset to GitHub, it was accessed locally.
 
-- The `Exclusive Economic Zone (EEZ) Boundary` dataset is from Marine Regions.  The EEZ data is stored in `/data/` folder in the repo as `wc_regions_clean.shp`, I did not push the original full dataset to GitHub, it was accessed locally.
+- The `Exclusive Economic Zone (EEZ) Boundary` data is from Marine Regions.  The EEZ data is stored in `/data/` folder in the repo as `wc_regions_clean.shp`, I did not push the original full dataset to GitHub, it was accessed locally.
 
-- The `West Coast State Boundary` dataset is from TIGRIS.  The state boundary data was accessed using the `TIGRIS` library in R-Studio.
-  
+- The `State Boundary` dataset is from TIGER/Line Shapefiles. R package `TIGRIS` version 1.5.0. https://CRAN.R-project.org/package=tigris.
   
 ### Repo structure:
 
@@ -53,13 +52,16 @@ EDS223-HW3
 
 ### References:
 
-- Habitat Suitability Ranges: [sealifebase.ca](https://www.sealifebase.ca/search.php) *Access date: 11/20/24*
+- [sealifebase.ca](https://www.sealifebase.ca/search.php) *Access date: 11/20/24*
 
-- Exclusive Economic Zones (EEZ) Boundaries: [Marine Regions](https://www.marineregions.org/eez.php) *Access date: 11/20/24*
+- [Marine Regions](https://www.marineregions.org/eez.php) *Access date: 11/20/24*
 
-- Sea Surface Temperature [NOAA’s 5km Daily Global Satellite Sea Surface Temperature Anomaly v3.1](https://coralreefwatch.noaa.gov/product/5km/index_5km_ssta.php) *Access date: 11/20/24*
+- [NOAA’s 5km Daily Global Satellite Sea Surface Temperature Anomaly v3.1](https://coralreefwatch.noaa.gov/product/5km/index_5km_ssta.php) *Access date: 11/20/24*
 
-- Bathymetry: [General Bathymetric Chart of the Oceans (GEBCO)](https://www.gebco.net/data_and_products/gridded_bathymetry_data/#area) *Access date: 11/20/24*
+- [General Bathymetric Chart of the Oceans (GEBCO)](https://www.gebco.net/data_and_products/gridded_bathymetry_data/#area) *Access date: 11/20/24*
+
+- [TIGER/Line Shapefiles version 1.5.0](https://CRAN.R-project.org/package=tigris) *Access date: 11/20/24*
+
 
 ### Acknowledgments:
 
