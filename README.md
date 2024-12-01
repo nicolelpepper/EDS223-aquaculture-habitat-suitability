@@ -24,17 +24,15 @@
 
 ### Data Descriptions:
 
-- The `Average Annual Sea Surface Temperature` (SST) data is a collection of raster files containing the Average Annual SST for 2008 - 2012 along the U.S. West Coast. It is from NOAA’s 5km Daily Global Satellite Sea Surface Temperature Anomaly. The SST data is stored in `/data/` folder in the repo as `average_annual_sst_YEAR`, I did not push the original full dataset to GitHub, it was accessed locally.
+- The `Average Annual Sea Surface Temperature` (SST) data is a collection of raster files containing the average annual SST for 2008 - 2012 along the U.S. West Coast. It is from NOAA’s 5km Daily Global Satellite Sea Surface Temperature Anomaly. The SST data is stored in `/data/` folder in the repo as `average_annual_sst_YEAR.tif`, I did not push the original full dataset to GitHub, it was accessed locally.
   
-- The `depth` dataset is from General Bathymetric Chart of the Oceans (GEBCO). image from Landsat Collection 2 Level-2, from the Microsof Planetary Computer data catalogue. Landsat Collection 2 Level-2 Science Products consist of atmospherically corrected surface reflectance and surface temperature image data. Collection 2 Level-2 Science Products are available from August 22, 1982 to present. It is accessed through UCSB Workbench 1 `/courses/EDS220/data/hwk4_landsat_data landsat8-2018-01-26-sb-simplified.nc`. 
+- The `Depth` dataset is from General Bathymetric Chart of the Oceans (GEBCO). The SST data is stored in `/data/` folder in the repo as `depth.tif`, I did not push the original full dataset to GitHub, it was accessed locally.
 
-Habitat Suitability Ranges: sealifebase.ca Access date: 11/20/24
+- The `Exclusive Economic Zone (EEZ) Boundary` dataset is from Marine Regions.  The EEZ data is stored in `/data/` folder in the repo as `wc_regions_clean.shp`, I did not push the original full dataset to GitHub, it was accessed locally.
 
-Exclusive Economic Zones (EEZ) Boundaries: Marine Regions Access date: 11/20/24
-
-Sea Surface Temperature NOAA’s 5km Daily Global Satellite Sea Surface Temperature Anomaly v3.1 Access date: 11/20/24
-
-Bathymetry: General Bathymetric Chart of the Oceans (GEBCO) Access date: 11/20/24
+- The `West Coast State Boundary` dataset is from TIGRIS.  The state boundary data was accessed using the `TIGRIS` library in R-Studio.
+  
+  
 ### Repo structure:
 
 ```
