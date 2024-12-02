@@ -52,15 +52,15 @@ EDS223-HW3
 
 ### References:
 
-- [sealifebase.ca](https://www.sealifebase.ca/search.php)[Data] *Access date: 11/20/24*
+- [sealifebase.ca](https://www.sealifebase.ca/search.php) [Data] *Access date: 11/20/24*
 
-- [Marine Regions](https://www.marineregions.org/eez.php)[Data] *Access date: 11/20/24*
+- [Marine Regions](https://www.marineregions.org/eez.php) [Data] *Access date: 11/20/24*
 
-- [NOAA’s 5km Daily Global Satellite Sea Surface Temperature Anomaly v3.1](https://coralreefwatch.noaa.gov/product/5km/index_5km_ssta.php)[Data] *Access date: 11/20/24*
+- [NOAA’s 5km Daily Global Satellite Sea Surface Temperature Anomaly v3.1](https://coralreefwatch.noaa.gov/product/5km/index_5km_ssta.php) [Data] *Access date: 11/20/24*
 
-- [General Bathymetric Chart of the Oceans (GEBCO)](https://www.gebco.net/data_and_products/gridded_bathymetry_data/#area)[Data] *Access date: 11/20/24*
+- [General Bathymetric Chart of the Oceans (GEBCO)](https://www.gebco.net/data_and_products/gridded_bathymetry_data/#area) [Data] *Access date: 11/20/24*
 
-- [TIGER/Line Shapefiles version 1.5.0](https://CRAN.R-project.org/package=tigris)[Data] *Access date: 11/20/24*
+- [TIGER/Line Shapefiles version 1.5.0](https://CRAN.R-project.org/package=tigris) [Data] *Access date: 11/20/24*
 
 
 ### Acknowledgments:
