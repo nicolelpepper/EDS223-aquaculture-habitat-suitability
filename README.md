@@ -8,7 +8,7 @@
 **Author:** Nicole Pepper
 
 <div style="text-align: left;">
-  <img src="https://eds-223-geospatial.github.io/assignments/images/aquaculture.jpg" alt="Image" width="800">
+  <img src="https://eds-223-geospatial.github.io/assignments/images/aquaculture.jpg" alt="Image" width="500">
 
 *Image by [Hanson Lu](https://unsplash.com/photos/aerial-photography-of-white-frames-on-top-of-water-eUfnha6ev9g)*
 
