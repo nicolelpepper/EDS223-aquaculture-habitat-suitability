@@ -1,6 +1,6 @@
 ---
-title: "Marine Aquaculture Suitability by EEZ Zone on West Coast of the U.S."
-subtitle: "EDS 223 - Geospatial Analysis"
+title: "West Coast Aquaculture Habitat Suitability Analysis"
+subtitle: "UCSB MEDS - EDS 223 - Geospatial Analysis"
 author: "Nicole Pepper"
 date: last-modified
 execute: 
@@ -13,9 +13,19 @@ format:
     code-fold: true
 editor_options: 
   chunk_output_type: console
-
 ---
-### 1. Set up Workspace
+![ ](images/aquaculture-cover-photo.png){width=800}
+
+### About this Document:
+[This Quarto Doc](https://github.com/nicolelpepper/EDS223-aquaculture-habitat-suitability/blob/main/aquaculture-habitat-suitability.qmd) contains my analysis identifying the suitability of Exclusive Economic Zones (EEZs) along the U.S. West Coast for developing marine aquaculture using sea surface temperature (SST) and depth below sea level. For this analysis, I create a generalizable function that outputs a map showing EEZ regions colored by the amount of suitable area for aquaculture.
+
+### Technical Highlights:
+- Combining vector/raster data
+- Resampling & masking raster data
+- Raster calculations for determining suitability
+- Creating a function for streamlined workflow
+
+### 1. Set Up Workspace
 ```{r}
 #| code-summary: "Load Libraries"
 
@@ -62,7 +72,6 @@ depth <- rast(here::here("data/depth.tif"))
 # Read in EEZ Zones
 eez_zones <- st_read(here::here("data/wc_regions_clean.shp"))
 
-
 # Get US state boundaries from tigris library
 states_sf <- tigris::states()
 
@@ -72,7 +81,6 @@ west_coast_states <- states_sf[states_sf$NAME %in% c("California", "Oregon", "Ne
 ```
 
 ### 2. Prepare Data
-
 ```{r}
 #| code-summary: "Prepare SST Data"
 
@@ -126,6 +134,14 @@ names(data_stack) <- c("depth", "mean_sst")
 ```
 
 ### 3. Calculate Oyster Habitat Suitability by EEZ Zone
+Create a workflow to find suitable locations for oysters based on range of suitable sea surface temperature (SST) and depth values.
+
+Table A. *Suitable Oyster Range*
+
+| Species | Min Temp | Max Depth | Min Depth |  Max Depth |
+|------------------|------------------|-------------------|------------------|------------------|
+|Oyster          | 10                       | 20                        | - 40               |  0               | 
+
 ```{r}
 #| code-summary: "Reclassify SST & Depth Values for Suitable Habitat"
 
@@ -156,9 +172,7 @@ names(data_stack) <- c("depth", "mean_sst")
 ```
 
 ```{r}
-#| code-summary: "Calculate Suitability & Crop to EEZ Zone"
-
-# ---- Calculate Suitability ----
+#| code-summary: "Calculate Oyster Suitability"
 
   # Combine SST and depth suitability
   species_suitability <- sst_suitability * depth_suitability
@@ -175,8 +189,10 @@ names(data_stack) <- c("depth", "mean_sst")
 ```{r}
 #| code-summary: "Calculate Suitable Area By EEZ Zone"
 
-  # Mask species_suitability to eez zones
+  # Mask species_suitability to EEZ zones
   species_suitability <- mask(species_suitability, eez_zones)
+  
+  # ---- Calculate Suitable Area by EEZ Zone ----
 
   # Create a raster where each cell is it's size (will be used to summarize area)
   cell_area <- cellSize(species_suitability, unit = 'km')
@@ -199,12 +215,12 @@ names(data_stack) <- c("depth", "mean_sst")
     arrange(rank)
 ```
 
-```{r}
+Preliminary Results:
+```{r, fig.height=4, fig.width=12}
 #| code-summary: "Visualize Preliminary Results"
+#| echo: false
 
-# Set up the plotting layout: 1 row, 3 columns
-par(mfrow = c(1, 3))
-
+par(mfrow = c(1, 3), mar = c(2, 2, 2, 1)) 
 # Plot depth_suitability
 plot(depth_suitability, main = "Depth Suitability")
 
@@ -214,14 +230,10 @@ plot(sst_suitability, main = "SST Suitability")
 # Plot eez_suitability
 plot(eez_suitability, main = "EEZs Cropped to Suitable Areas")
 
-# Reset plotting layout
-par(mfrow = c(1, 1))
+# Reset margins
+par(mfrow = c(1, 1), mar = c(5, 4, 4, 2) + 0.1)
 
 ```
-
-| Species | Min Temp | Max Depth | Min Depth |  Max Depth |
-|------------------|------------------|-------------------|------------------|------------------|
-|Oyster          | 10                       | 20                        | - 40               |  0               | 
 
 ```{r}
 #| code-summary: "Map Oyster Habitat Suitability by EEZ Zone"
@@ -311,10 +323,10 @@ par(mfrow = c(1, 1))
 # Display Map
  oyster_test_map 
 ```
-
 *This map shows habitat suitability for oyster aquaculture along the U.S. West Coast. Suitable areas, highlighted in yellow, were calculated using thresholds for sea surface temperature and depth below sea level, based on their known range according to [sealifebase.ca](https://www.sealifebase.ca/search.php). The threshold values for oyster can be located above on Table A. The Exclusive Economic Zones (EEZ) regions are colored by the the amount of suitable area, where dark turquoise indicates the largest amount of area and light blue is the smallest. Central California ranked 1st on the list at 4,000 km² and Northern California ranked fifth, the lowest, at 178km².*
 
 ### 4. Generalize Workflow for Habitat Suitability
+Create a function to find suitable locations for a given species based on range of suitable sea surface temperature (SST) and depth values.
 
 **Arguments:**
 
@@ -485,72 +497,37 @@ habitat_suitability_map <- function(species, min_sst, max_sst, min_depth, max_de
 ### 5. Use function with Test Species
 
 
-Table A.
+Table B. *Suitable Giant Kelp Range*
 
 | Species | Min Temp | Max Depth | Min Depth |  Max Depth |
 |------------------|------------------|-------------------|------------------|------------------|
-| Kelp          | 11                       | 30                         | -70                | 0               | 
+| Giant Kelp          | 11                       | 30                         | -70                | 0               | 
 
 Source: [sealifebase.ca](https://www.sealifebase.ca/search.php)
 
 ```{r}
 #| code-summary: "Calculate Kelp Habitat Suitability"
+#| code-fold: false
 
+# Calculate kelp suitability using range in Table B
 habitat_suitability_map("Kelp", 10,20,0,-40)
 ```
 
-*This map shows habitat suitability for giant kelp aquaculture along the U.S. West Coast. Suitable areas, highlighted in yellow, were calculated using thresholds for sea surface temperature and depth below sea level, based on their known range according to [sealifebase.ca](https://www.sealifebase.ca/search.php). The threshold values for kelp can be located above on Table A. The Exclusive Economic Zones (EEZ) regions are colored by the the amount of suitable area, where dark turquoise indicates the largest amount of area and light blue is the smallest. Central California ranked 1st on the list at 4,000 km² and Northern California ranked fifth, the lowest, at 178km².*
+*This map shows habitat suitability for giant kelp aquaculture along the U.S. West Coast. Suitable areas, highlighted in yellow, were calculated using thresholds for sea surface temperature and depth below sea level, based on their known range according to [sealifebase.ca](https://www.sealifebase.ca/search.php). The threshold values for kelp can be located above on Table B. The Exclusive Economic Zones (EEZ) regions are colored by the the amount of suitable area, where dark turquoise indicates the largest amount of area and light blue is the smallest. Central California ranked 1st on the list at 4,000 km² and Northern California ranked fifth, the lowest, at 178km².*
+
+### References:
+
+- [sealifebase.ca](https://www.sealifebase.ca/search.php) *Access date: 11/20/24*
+
+- [Marine Regions](https://www.marineregions.org/eez.php) *Access date: 11/20/24*
+
+- [NOAA’s 5km Daily Global Satellite Sea Surface Temperature Anomaly v3.1](https://coralreefwatch.noaa.gov/product/5km/index_5km_ssta.php) *Access date: 11/20/24*
+
+- [General Bathymetric Chart of the Oceans (GEBCO)](https://www.gebco.net/data_and_products/gridded_bathymetry_data/#area) *Access date: 11/20/24*
+
+- [TIGER/Line Shapefiles version 1.5.0](https://CRAN.R-project.org/package=tigris) *Access date: 11/20/24*
 
 
-```{r}
-# ---- Prepare labels for map ----
+### Acknowledgments:
 
-# ---- Create Suitability Map ----
-
-  # Add unsuitable area for ocean background
-  oyster_test_map <- tm_shape(species_unsuitable) + 
-    tm_raster(palette = "#124D5C",
-              legend.show = FALSE) +
- 
-  # Add border color around EEZ zones boundaries 
-  tm_shape(eez_suitability_area) +
-    tm_borders(col = "#124D5C",
-               lwd = .25) +
-    
-  # Add state borders for background
-  tm_shape(west_coast_states) +
-  tm_borders(col = "white",
-             alpha = 0.1,
-             lwd = .25) +
-    
-  tm_shape(species_suitability) +
-  tm_raster(palette = "yellow",
-              labels = "Suitable Area",
-              title = '') + 
-  
-  # Add tick marks 
-  tm_grid(lines = FALSE, tick = TRUE, alpha = 0.8, n.x = 5, n.y = 5) +
-
-    
-  # Format layout 
-  tm_layout(main.title = paste("U.S. West Coast\n Oyster Habitat Suitability"),
-              main.title.position = c("center", "top"),
-              legend.text.color = "white",
-              legend.position = c(0.55,0.6),
-              legend.title.color = "white",
-              legend.title.size = 1.2,
-              bg.color = '#07222B')
-
-# Display Map
- oyster_test_map 
-```
-
-### 6. Resources:
-
-Habitat Suitability Ranges: [sealifebase.ca](https://www.sealifebase.ca/search.php) *Access date: 11/20/24*
-
-Exclusive Economic Zones (EEZ) Boundaries: [Marine Regions](https://www.marineregions.org/eez.php) *Access date: 11/20/24*
-
-Sea Surface Temperature: [NOAA’s 5km Daily Global Satellite Sea Surface Temperature Anomaly v3.1](https://coralreefwatch.noaa.gov/product/5km/index_5km_ssta.php) *Access date: 11/20/24*
-
-Bathymetry: [General Bathymetric Chart of the Oceans (GEBCO)](https://www.gebco.net/data_and_products/gridded_bathymetry_data/#area) *Access date: 11/20/24*
+This assignment was created by Ruth Oliver, EDS 223 - Fall 2024 Instructor.
