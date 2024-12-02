@@ -15,7 +15,7 @@ editor_options:
   chunk_output_type: console
 
 ---
-#### 1. Set up Workspace
+### 1. Set up Workspace
 ```{r}
 #| code-summary: "Load Libraries"
 
@@ -71,7 +71,7 @@ west_coast_states <- states_sf[states_sf$NAME %in% c("California", "Oregon", "Ne
 
 ```
 
-#### 2. Prepare Data
+### 2. Prepare Data
 
 ```{r}
 #| code-summary: "Prepare SST Data"
@@ -125,8 +125,7 @@ names(data_stack) <- c("depth", "mean_sst")
 
 ```
 
-
-#### 3. Calculate Oyster Habitat Suitability by EEZ Zone
+### 3. Calculate Oyster Habitat Suitability by EEZ Zone
 ```{r}
 #| code-summary: "Reclassify SST & Depth Values for Suitable Habitat"
 
@@ -220,6 +219,10 @@ par(mfrow = c(1, 1))
 
 ```
 
+| Species | Min Temp | Max Depth | Min Depth |  Max Depth |
+|------------------|------------------|-------------------|------------------|------------------|
+|Oyster          | 10                       | 20                        | - 40               |  0               | 
+
 ```{r}
 #| code-summary: "Map Oyster Habitat Suitability by EEZ Zone"
 
@@ -305,18 +308,15 @@ par(mfrow = c(1, 1))
               legend.title.size = 1.2,
               bg.color = '#07222B')
 
-
+# Display Map
+ oyster_test_map 
 ```
 
-
+*This map shows habitat suitability for oyster aquaculture along the U.S. West Coast. Suitable areas, highlighted in yellow, were calculated using thresholds for sea surface temperature and depth below sea level, based on their known range according to [sealifebase.ca](https://www.sealifebase.ca/search.php). The threshold values for oyster can be located above on Table A. The Exclusive Economic Zones (EEZ) regions are colored by the the amount of suitable area, where dark turquoise indicates the largest amount of area and light blue is the smallest. Central California ranked 1st on the list at 4,000 km² and Northern California ranked fifth, the lowest, at 178km².*
 
 ### 4. Generalize Workflow for Habitat Suitability
 
-#### Create a 'Choose-your-own species' function
-
-**About the function:** 
-
-Arguments:
+**Arguments:**
 
 - `species`: a string containing the species name
 
@@ -329,7 +329,7 @@ Arguments:
 - `max_depth`: maximum depth below sea level 
 
 
-Outputs: Map of EEZ regions colored by amount of suitable area
+**Outputs:** Map of EEZ regions colored by amount of suitable area
 
 ```{r}
 #| code-summary: "Create a Habitat Suitability Function"
@@ -482,24 +482,16 @@ habitat_suitability_map <- function(species, min_sst, max_sst, min_depth, max_de
 
 ```
 
-#### 5. Use function with Test Species
+### 5. Use function with Test Species
 
 
 Table A.
 
 | Species | Min Temp | Max Depth | Min Depth |  Max Depth |
 |------------------|------------------|-------------------|------------------|------------------|
-|Oyster          | 10                       | 20                        | - 40               |  0               | 
 | Kelp          | 11                       | 30                         | -70                | 0               | 
 
 Source: [sealifebase.ca](https://www.sealifebase.ca/search.php)
-```{r}
-#| code-summary: "Calculate Oyster Habitat Suitability"
-
-habitat_suitability_map("Oyster", 11,30,0, -70)
-
-```
-*This map shows habitat suitability for oyster aquaculture along the U.S. West Coast. Suitable areas, highlighted in yellow, were calculated using thresholds for sea surface temperature and depth below sea level, based on their known range according to [sealifebase.ca](https://www.sealifebase.ca/search.php). The threshold values for oyster can be located above on Table A. The Exclusive Economic Zones (EEZ) regions are colored by the the amount of suitable area, where dark turquoise indicates the largest amount of area and light blue is the smallest. Central California ranked 1st on the list at 4,000 km² and Northern California ranked fifth, the lowest, at 178km².*
 
 ```{r}
 #| code-summary: "Calculate Kelp Habitat Suitability"
@@ -510,16 +502,55 @@ habitat_suitability_map("Kelp", 10,20,0,-40)
 *This map shows habitat suitability for giant kelp aquaculture along the U.S. West Coast. Suitable areas, highlighted in yellow, were calculated using thresholds for sea surface temperature and depth below sea level, based on their known range according to [sealifebase.ca](https://www.sealifebase.ca/search.php). The threshold values for kelp can be located above on Table A. The Exclusive Economic Zones (EEZ) regions are colored by the the amount of suitable area, where dark turquoise indicates the largest amount of area and light blue is the smallest. Central California ranked 1st on the list at 4,000 km² and Northern California ranked fifth, the lowest, at 178km².*
 
 
-#### 6. Resources:
+```{r}
+# ---- Prepare labels for map ----
 
-**Habitat Suitability Ranges:**
-[sealifebase.ca](https://www.sealifebase.ca/search.php) Access date: 11/20/24
+# ---- Create Suitability Map ----
 
-**Exclusive Economic Zones (EEZ) Boundaries:**
-[Marine Regions](https://www.marineregions.org/eez.php) Access date: 11/20/24
+  # Add unsuitable area for ocean background
+  oyster_test_map <- tm_shape(species_unsuitable) + 
+    tm_raster(palette = "#124D5C",
+              legend.show = FALSE) +
+ 
+  # Add border color around EEZ zones boundaries 
+  tm_shape(eez_suitability_area) +
+    tm_borders(col = "#124D5C",
+               lwd = .25) +
+    
+  # Add state borders for background
+  tm_shape(west_coast_states) +
+  tm_borders(col = "white",
+             alpha = 0.1,
+             lwd = .25) +
+    
+  tm_shape(species_suitability) +
+  tm_raster(palette = "yellow",
+              labels = "Suitable Area",
+              title = '') + 
+  
+  # Add tick marks 
+  tm_grid(lines = FALSE, tick = TRUE, alpha = 0.8, n.x = 5, n.y = 5) +
 
-**Sea Surface Temperature**
-[NOAA’s 5km Daily Global Satellite Sea Surface Temperature Anomaly v3.1](https://coralreefwatch.noaa.gov/product/5km/index_5km_ssta.php) Access date: 11/20/24
+    
+  # Format layout 
+  tm_layout(main.title = paste("U.S. West Coast\n Oyster Habitat Suitability"),
+              main.title.position = c("center", "top"),
+              legend.text.color = "white",
+              legend.position = c(0.55,0.6),
+              legend.title.color = "white",
+              legend.title.size = 1.2,
+              bg.color = '#07222B')
 
-**Bathymetry:**
-[General Bathymetric Chart of the Oceans (GEBCO)](https://www.gebco.net/data_and_products/gridded_bathymetry_data/#area) Access date: 11/20/24
+# Display Map
+ oyster_test_map 
+```
+
+### 6. Resources:
+
+Habitat Suitability Ranges: [sealifebase.ca](https://www.sealifebase.ca/search.php) *Access date: 11/20/24*
+
+Exclusive Economic Zones (EEZ) Boundaries: [Marine Regions](https://www.marineregions.org/eez.php) *Access date: 11/20/24*
+
+Sea Surface Temperature: [NOAA’s 5km Daily Global Satellite Sea Surface Temperature Anomaly v3.1](https://coralreefwatch.noaa.gov/product/5km/index_5km_ssta.php) *Access date: 11/20/24*
+
+Bathymetry: [General Bathymetric Chart of the Oceans (GEBCO)](https://www.gebco.net/data_and_products/gridded_bathymetry_data/#area) *Access date: 11/20/24*

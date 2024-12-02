@@ -81,7 +81,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#generalize-workflow-for-habitat-suitability" id="toc-generalize-workflow-for-habitat-suitability" class="nav-link active" data-scroll-target="#generalize-workflow-for-habitat-suitability">4. Generalize Workflow for Habitat Suitability</a></li>
+  <li><a href="#set-up-workspace" id="toc-set-up-workspace" class="nav-link active" data-scroll-target="#set-up-workspace">1. Set up Workspace</a></li>
+  <li><a href="#prepare-data" id="toc-prepare-data" class="nav-link" data-scroll-target="#prepare-data">2. Prepare Data</a></li>
+  <li><a href="#calculate-oyster-habitat-suitability-by-eez-zone" id="toc-calculate-oyster-habitat-suitability-by-eez-zone" class="nav-link" data-scroll-target="#calculate-oyster-habitat-suitability-by-eez-zone">3. Calculate Oyster Habitat Suitability by EEZ Zone</a></li>
+  <li><a href="#generalize-workflow-for-habitat-suitability" id="toc-generalize-workflow-for-habitat-suitability" class="nav-link" data-scroll-target="#generalize-workflow-for-habitat-suitability">4. Generalize Workflow for Habitat Suitability</a></li>
+  <li><a href="#use-function-with-test-species" id="toc-use-function-with-test-species" class="nav-link" data-scroll-target="#use-function-with-test-species">5. Use function with Test Species</a></li>
+  <li><a href="#resources" id="toc-resources" class="nav-link" data-scroll-target="#resources">6. Resources:</a></li>
   </ul>
 </nav>
 </div>
@@ -119,8 +124,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="set-up-workspace" class="level4">
-<h4 class="anchored" data-anchor-id="set-up-workspace">1. Set up Workspace</h4>
+<section id="set-up-workspace" class="level3">
+<h3 class="anchored" data-anchor-id="set-up-workspace">1. Set up Workspace</h3>
 <div class="cell">
 <details class="code-fold">
 <summary>Load Libraries</summary>
@@ -175,8 +180,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 </section>
-<section id="prepare-data" class="level4">
-<h4 class="anchored" data-anchor-id="prepare-data">2. Prepare Data</h4>
+<section id="prepare-data" class="level3">
+<h3 class="anchored" data-anchor-id="prepare-data">2. Prepare Data</h3>
 <div class="cell">
 <details class="code-fold">
 <summary>Prepare SST Data</summary>
@@ -228,8 +233,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 </section>
-<section id="calculate-oyster-habitat-suitability-by-eez-zone" class="level4">
-<h4 class="anchored" data-anchor-id="calculate-oyster-habitat-suitability-by-eez-zone">3. Calculate Oyster Habitat Suitability by EEZ Zone</h4>
+<section id="calculate-oyster-habitat-suitability-by-eez-zone" class="level3">
+<h3 class="anchored" data-anchor-id="calculate-oyster-habitat-suitability-by-eez-zone">3. Calculate Oyster Habitat Suitability by EEZ Zone</h3>
 <div class="cell">
 <details class="code-fold">
 <summary>Reclassify SST &amp; Depth Values for Suitable Habitat</summary>
@@ -328,6 +333,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 19%">
+<col style="width: 20%">
+<col style="width: 19%">
+<col style="width: 19%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Species</th>
+<th>Min Temp</th>
+<th>Max Depth</th>
+<th>Min Depth</th>
+<th>Max Depth</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Oyster</td>
+<td>10</td>
+<td>20</td>
+<td>- 40</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
 <div class="cell">
 <details class="code-fold">
 <summary>Map Oyster Habitat Suitability by EEZ Zone</summary>
@@ -411,16 +443,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-78"><a href="#cb10-78" aria-hidden="true" tabindex="-1"></a>              <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.55</span>,<span class="fl">0.45</span>),</span>
 <span id="cb10-79"><a href="#cb10-79" aria-hidden="true" tabindex="-1"></a>              <span class="at">legend.title.color =</span> <span class="st">"white"</span>,</span>
 <span id="cb10-80"><a href="#cb10-80" aria-hidden="true" tabindex="-1"></a>              <span class="at">legend.title.size =</span> <span class="fl">1.2</span>,</span>
-<span id="cb10-81"><a href="#cb10-81" aria-hidden="true" tabindex="-1"></a>              <span class="at">bg.color =</span> <span class="st">'#07222B'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-81"><a href="#cb10-81" aria-hidden="true" tabindex="-1"></a>              <span class="at">bg.color =</span> <span class="st">'#07222B'</span>)</span>
+<span id="cb10-82"><a href="#cb10-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-83"><a href="#cb10-83" aria-hidden="true" tabindex="-1"></a><span class="co"># Display Map</span></span>
+<span id="cb10-84"><a href="#cb10-84" aria-hidden="true" tabindex="-1"></a> oyster_test_map </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="aquaculture-habitat-suitability_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
 </div>
+</div>
+</div>
+<p><em>This map shows habitat suitability for oyster aquaculture along the U.S. West Coast. Suitable areas, highlighted in yellow, were calculated using thresholds for sea surface temperature and depth below sea level, based on their known range according to <a href="https://www.sealifebase.ca/search.php">sealifebase.ca</a>. The threshold values for oyster can be located above on Table A. The Exclusive Economic Zones (EEZ) regions are colored by the the amount of suitable area, where dark turquoise indicates the largest amount of area and light blue is the smallest. Central California ranked 1st on the list at 4,000 km² and Northern California ranked fifth, the lowest, at 178km².</em></p>
 </section>
 <section id="generalize-workflow-for-habitat-suitability" class="level3">
 <h3 class="anchored" data-anchor-id="generalize-workflow-for-habitat-suitability">4. Generalize Workflow for Habitat Suitability</h3>
-<section id="create-a-choose-your-own-species-function" class="level4">
-<h4 class="anchored" data-anchor-id="create-a-choose-your-own-species-function">Create a ‘Choose-your-own species’ function</h4>
-<p><strong>About the function:</strong></p>
-<p>Arguments:</p>
+<p><strong>Arguments:</strong></p>
 <ul>
 <li><p><code>species</code>: a string containing the species name</p></li>
 <li><p><code>min_temp</code>: minimum suitable sea surface temperature in Celsius</p></li>
@@ -428,7 +468,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p><code>min_depth</code>: minimum depth below sea level (0 = sea level)</p></li>
 <li><p><code>max_depth</code>: maximum depth below sea level</p></li>
 </ul>
-<p>Outputs: Map of EEZ regions colored by amount of suitable area</p>
+<p><strong>Outputs:</strong> Map of EEZ regions colored by amount of suitable area</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Create a Habitat Suitability Function</summary>
@@ -580,8 +620,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 </section>
-<section id="use-function-with-test-species" class="level4">
-<h4 class="anchored" data-anchor-id="use-function-with-test-species">5. Use function with Test Species</h4>
+<section id="use-function-with-test-species" class="level3">
+<h3 class="anchored" data-anchor-id="use-function-with-test-species">5. Use function with Test Species</h3>
 <p>Table A.</p>
 <table class="caption-top table">
 <colgroup>
@@ -602,13 +642,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td>Oyster</td>
-<td>10</td>
-<td>20</td>
-<td>- 40</td>
-<td>0</td>
-</tr>
-<tr class="even">
 <td>Kelp</td>
 <td>11</td>
 <td>30</td>
@@ -620,8 +653,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Source: <a href="https://www.sealifebase.ca/search.php">sealifebase.ca</a></p>
 <div class="cell">
 <details class="code-fold">
-<summary>Calculate Oyster Habitat Suitability</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">habitat_suitability_map</span>(<span class="st">"Oyster"</span>, <span class="dv">11</span>,<span class="dv">30</span>,<span class="dv">0</span>, <span class="sc">-</span><span class="dv">70</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<summary>Calculate Kelp Habitat Suitability</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">habitat_suitability_map</span>(<span class="st">"Kelp"</span>, <span class="dv">10</span>,<span class="dv">20</span>,<span class="dv">0</span>,<span class="sc">-</span><span class="dv">40</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -631,11 +664,50 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p><em>This map shows habitat suitability for oyster aquaculture along the U.S. West Coast. Suitable areas, highlighted in yellow, were calculated using thresholds for sea surface temperature and depth below sea level, based on their known range according to <a href="https://www.sealifebase.ca/search.php">sealifebase.ca</a>. The threshold values for oyster can be located above on Table A. The Exclusive Economic Zones (EEZ) regions are colored by the the amount of suitable area, where dark turquoise indicates the largest amount of area and light blue is the smallest. Central California ranked 1st on the list at 4,000 km² and Northern California ranked fifth, the lowest, at 178km².</em></p>
+<p><em>This map shows habitat suitability for giant kelp aquaculture along the U.S. West Coast. Suitable areas, highlighted in yellow, were calculated using thresholds for sea surface temperature and depth below sea level, based on their known range according to <a href="https://www.sealifebase.ca/search.php">sealifebase.ca</a>. The threshold values for kelp can be located above on Table A. The Exclusive Economic Zones (EEZ) regions are colored by the the amount of suitable area, where dark turquoise indicates the largest amount of area and light blue is the smallest. Central California ranked 1st on the list at 4,000 km² and Northern California ranked fifth, the lowest, at 178km².</em></p>
 <div class="cell">
 <details class="code-fold">
-<summary>Calculate Kelp Habitat Suitability</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">habitat_suitability_map</span>(<span class="st">"Kelp"</span>, <span class="dv">10</span>,<span class="dv">20</span>,<span class="dv">0</span>,<span class="sc">-</span><span class="dv">40</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- Prepare labels for map ----</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- Create Suitability Map ----</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add unsuitable area for ocean background</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  oyster_test_map <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(species_unsuitable) <span class="sc">+</span> </span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_raster</span>(<span class="at">palette =</span> <span class="st">"#124D5C"</span>,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">legend.show =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add border color around EEZ zones boundaries </span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(eez_suitability_area) <span class="sc">+</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_borders</span>(<span class="at">col =</span> <span class="st">"#124D5C"</span>,</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>               <span class="at">lwd =</span> .<span class="dv">25</span>) <span class="sc">+</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add state borders for background</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(west_coast_states) <span class="sc">+</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">col =</span> <span class="st">"white"</span>,</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>             <span class="at">alpha =</span> <span class="fl">0.1</span>,</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>             <span class="at">lwd =</span> .<span class="dv">25</span>) <span class="sc">+</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(species_suitability) <span class="sc">+</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_raster</span>(<span class="at">palette =</span> <span class="st">"yellow"</span>,</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>              <span class="at">labels =</span> <span class="st">"Suitable Area"</span>,</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>              <span class="at">title =</span> <span class="st">''</span>) <span class="sc">+</span> </span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add tick marks </span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_grid</span>(<span class="at">lines =</span> <span class="cn">FALSE</span>, <span class="at">tick =</span> <span class="cn">TRUE</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>, <span class="at">n.x =</span> <span class="dv">5</span>, <span class="at">n.y =</span> <span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Format layout </span></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="fu">paste</span>(<span class="st">"U.S. West Coast</span><span class="sc">\n</span><span class="st"> Oyster Habitat Suitability"</span>),</span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>              <span class="at">main.title.position =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"top"</span>),</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>              <span class="at">legend.text.color =</span> <span class="st">"white"</span>,</span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>              <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.55</span>,<span class="fl">0.6</span>),</span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>              <span class="at">legend.title.color =</span> <span class="st">"white"</span>,</span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>              <span class="at">legend.title.size =</span> <span class="fl">1.2</span>,</span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>              <span class="at">bg.color =</span> <span class="st">'#07222B'</span>)</span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Display Map</span></span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a> oyster_test_map </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -645,15 +717,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p><em>This map shows habitat suitability for giant kelp aquaculture along the U.S. West Coast. Suitable areas, highlighted in yellow, were calculated using thresholds for sea surface temperature and depth below sea level, based on their known range according to <a href="https://www.sealifebase.ca/search.php">sealifebase.ca</a>. The threshold values for kelp can be located above on Table A. The Exclusive Economic Zones (EEZ) regions are colored by the the amount of suitable area, where dark turquoise indicates the largest amount of area and light blue is the smallest. Central California ranked 1st on the list at 4,000 km² and Northern California ranked fifth, the lowest, at 178km².</em></p>
 </section>
-<section id="resources" class="level4">
-<h4 class="anchored" data-anchor-id="resources">6. Resources:</h4>
-<p><strong>Habitat Suitability Ranges:</strong> <a href="https://www.sealifebase.ca/search.php">sealifebase.ca</a> Access date: 11/20/24</p>
-<p><strong>Exclusive Economic Zones (EEZ) Boundaries:</strong> <a href="https://www.marineregions.org/eez.php">Marine Regions</a> Access date: 11/20/24</p>
-<p><strong>Sea Surface Temperature</strong> <a href="https://coralreefwatch.noaa.gov/product/5km/index_5km_ssta.php">NOAA’s 5km Daily Global Satellite Sea Surface Temperature Anomaly v3.1</a> Access date: 11/20/24</p>
-<p><strong>Bathymetry:</strong> <a href="https://www.gebco.net/data_and_products/gridded_bathymetry_data/#area">General Bathymetric Chart of the Oceans (GEBCO)</a> Access date: 11/20/24</p>
-</section>
+<section id="resources" class="level3">
+<h3 class="anchored" data-anchor-id="resources">6. Resources:</h3>
+<p>Habitat Suitability Ranges: <a href="https://www.sealifebase.ca/search.php">sealifebase.ca</a> <em>Access date: 11/20/24</em></p>
+<p>Exclusive Economic Zones (EEZ) Boundaries: <a href="https://www.marineregions.org/eez.php">Marine Regions</a> <em>Access date: 11/20/24</em></p>
+<p>Sea Surface Temperature: <a href="https://coralreefwatch.noaa.gov/product/5km/index_5km_ssta.php">NOAA’s 5km Daily Global Satellite Sea Surface Temperature Anomaly v3.1</a> <em>Access date: 11/20/24</em></p>
+<p>Bathymetry: <a href="https://www.gebco.net/data_and_products/gridded_bathymetry_data/#area">General Bathymetric Chart of the Oceans (GEBCO)</a> <em>Access date: 11/20/24</em></p>
 </section>
 
 </main>
