@@ -17,9 +17,10 @@
 [This repository](https://github.com/nicolelpepper/EDS223-aquaculture-habitat-suitability) contains a R-Studio Quarto Markdown document of my analysis identifying the suitability of Exclusive Economic Zones (EEZs) along the U.S. West Coast for developing marine aquaculture using sea surface temperature (SST) and depth below sea level. For this analysis, I create a generalizable function that outputs a map showing EEZ regions colored by the amount of suitable area for aquaculture.
 
 ### Technical Highlights:
-- Combining vector/raster data
-- Resampling & masking raster data
-- Raster calculations for determining suitability
+- Programming in R
+- Vector data wrangling with `sf`
+- Raster data wrangling with `terra` and `stars`
+- Data visualization with `tmap` and `ggplot`
 - Creating a function for streamlined workflow
 
 ### Data Descriptions:
