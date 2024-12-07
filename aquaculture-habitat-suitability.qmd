@@ -19,6 +19,7 @@ editor_options:
 ![R Programming](https://img.shields.io/badge/R_Programming-cornflowerblue?style=for-the-badge&logo=R) ![Remote Sensing](https://img.shields.io/badge/Remote_Sensing-green?style=for-the-badge)![GIS](https://img.shields.io/badge/GIS-purple?style=for-the-badge)  ![tmap](https://img.shields.io/badge/tmap-orange?style=for-the-badge) ![ggplot](https://img.shields.io/badge/ggplot-pink?style=for-the-badge) ![terra](https://img.shields.io/badge/terra-firebrick?style=for-the-badge)  ![stars](https://img.shields.io/badge/stars-yellow?style=for-the-badge) ![sf](https://img.shields.io/badge/sf-salmon?style=for-the-badge) 
 
 ![ ](images/aquaculture-cover-photo.png){width=800}
+
 ### About this Document:
 [This Quarto Doc](https://github.com/nicolelpepper/EDS223-aquaculture-habitat-suitability/blob/main/aquaculture-habitat-suitability.qmd) contains my analysis identifying the suitability of Exclusive Economic Zones (EEZs) along the U.S. West Coast for developing marine aquaculture using sea surface temperature (SST) and depth below sea level. For this analysis, I create a generalizable function that outputs a map showing EEZ regions colored by the amount of suitable area for aquaculture.
 
@@ -55,7 +56,7 @@ library(tigris)
 ```
 
 ```{r}
-#| code-summary: "Read in Project Data"
+#| code-summary: "Read in project data"
 #| output: false
 
 # ---- Read in Project Data ----
@@ -72,6 +73,7 @@ sst_stack <- lapply(sst_list, rast) %>%
 
 # Read in depth data
 depth <- rast(here::here("data/depth.tif"))
+depth_background <- rast(here::here("data/depth.tif"))
 
 # Read in EEZ Zones
 eez_zones <- st_read(here::here("data/wc_regions_clean.shp"))
@@ -86,7 +88,7 @@ west_coast_states <- states_sf[states_sf$NAME %in% c("California", "Oregon", "Ne
 
 ### 2. Prepare Data
 ```{r}
-#| code-summary: "Prepare SST Data"
+#| code-summary: "Prepare SST data"
 
 # Calculate mean SST
 mean_sst <- mean(sst_stack)
@@ -97,7 +99,7 @@ mean_sst <- mean_sst - 273.15
 ```
 
 ```{r}
-#| code-summary: "Prepare Data CRS"
+#| code-summary: "Prepare data CRS"
 
 # ---- Check CRS of data ----
 
@@ -147,7 +149,7 @@ Table A. *Suitable Oyster Range*
 |Oyster          | 10                       | 20                        | - 40               |  0               | 
 
 ```{r}
-#| code-summary: "Reclassify SST & Depth Values for Suitable Habitat"
+#| code-summary: "Reclassify SST & depth values for suitable habitat"
 
 # ---- Assign suitable sst range ----
   # Define matrix for reclassification of sst
@@ -176,7 +178,7 @@ Table A. *Suitable Oyster Range*
 ```
 
 ```{r}
-#| code-summary: "Calculate Oyster Suitability"
+#| code-summary: "Calculate oyster suitability"
 
   # Combine SST and depth suitability
   species_suitability <- sst_suitability * depth_suitability
@@ -191,12 +193,12 @@ Table A. *Suitable Oyster Range*
 ```
 
 ```{r}
-#| code-summary: "Calculate Suitable Area By EEZ Zone"
+#| code-summary: "Calculate suitable area by EEZ"
 
-  # Mask species_suitability to EEZ zones
+  # Mask species_suitability to EEZ
   species_suitability <- mask(species_suitability, eez_zones)
   
-  # ---- Calculate Suitable Area by EEZ Zone ----
+  # ---- Calculate Suitable Area by EEZ ----
 
   # Create a raster where each cell is it's size (will be used to summarize area)
   cell_area <- cellSize(species_suitability, unit = 'km')
@@ -221,7 +223,7 @@ Table A. *Suitable Oyster Range*
 
 Preliminary Results:
 ```{r, fig.height=4, fig.width=12}
-#| code-summary: "Visualize Preliminary Results"
+#| code-summary: "Visualize preliminary results"
 #| echo: false
 
 par(mfrow = c(1, 3), mar = c(2, 2, 2, 1)) 
@@ -240,7 +242,7 @@ par(mfrow = c(1, 1), mar = c(5, 4, 4, 2) + 0.1)
 ```
 
 ```{r}
-#| code-summary: "Map Oyster Habitat Suitability by EEZ Zone"
+#| code-summary: "Prepare labels for map"
 
 # ---- Prepare labels for map ----
 
@@ -249,6 +251,10 @@ par(mfrow = c(1, 1), mar = c(5, 4, 4, 2) + 0.1)
   
   # Round area field to remove decimals and add scientific notation for area labels
   eez_suitability_area$suitable_area_km_rounded <- paste(format(round(eez_suitability_area$suitable_area_km), big.mark = ",", scientific = FALSE), "km²")
+```
+
+```{r}
+#| code-summary: "Map oyster habitat suitability by EEZ"
 
 # ---- Create Suitability Map ----
 
@@ -256,13 +262,16 @@ par(mfrow = c(1, 1), mar = c(5, 4, 4, 2) + 0.1)
   oyster_test_map <- tm_shape(species_unsuitable) + 
     tm_raster(palette = "#124D5C",
               legend.show = FALSE) +
+    
   # Add eez_zones ranked by habitat suitability
   tm_shape(eez_suitability_area) +
     tm_fill(col = "rank",
             palette =  c("#00756D", "#00BFB2", "#6BCFC8", "#B2EFEF", "#CCFFFB"),
             title = "Suitable Area (km²)\n By EEZ Zone",
             border.alpha = 0.8,
+            alpha = 0.8,
             legend.show = FALSE) +
+  
   # Add border color around EEZ zones boundaries 
   tm_shape(eez_suitability_area) +
     tm_borders(col = "#124D5C",
@@ -348,7 +357,7 @@ Create a function to find suitable locations for a given species based on range 
 **Outputs:** Map of EEZ regions colored by amount of suitable area
 
 ```{r}
-#| code-summary: "Create a Habitat Suitability Function"
+#| code-summary: "Create a habitat suitability function"
 
 # ---- Create suitability function ----
 habitat_suitability_map <- function(species, min_sst, max_sst, min_depth, max_depth) {
@@ -427,13 +436,16 @@ habitat_suitability_map <- function(species, min_sst, max_sst, min_depth, max_de
   tm_shape(species_unsuitable) + 
     tm_raster(palette = "#124D5C",
               legend.show = FALSE) +
+    
   # Add eez_zones ranked by habitat suitability
   tm_shape(eez_suitability_area) +
     tm_fill(col = "rank",
             palette =  c("#00756D", "#00BFB2", "#6BCFC8", "#B2EFEF", "#CCFFFB"),
             title = "Suitable Area (km²)\n By EEZ Zone",
             border.alpha = 0.8,
+            alpha = 0.8,
             legend.show = FALSE) +
+    
   # Add border color around EEZ zones boundaries 
   tm_shape(eez_suitability_area) +
     tm_borders(col = "#124D5C",
@@ -444,7 +456,8 @@ habitat_suitability_map <- function(species, min_sst, max_sst, min_depth, max_de
   tm_borders(col = "white",
              alpha = 0.1,
              lwd = .25) +
-    
+  
+  # Add suitable area  
   tm_shape(species_suitability) +
   tm_raster(palette = "yellow",
               labels = "Suitable Area",
@@ -510,10 +523,10 @@ Table B. *Suitable Giant Kelp Range*
 Source: [sealifebase.ca](https://www.sealifebase.ca/search.php)
 
 ```{r}
-#| code-summary: "Calculate Kelp Habitat Suitability"
+#| code-summary: "Calculate kelp habitat suitability"
 #| code-fold: false
 
-# Calculate kelp suitability using range in Table B
+# Use function to calculate kelp suitability using range in Table B
 habitat_suitability_map("Kelp", 10,20,0,-40)
 ```
 
