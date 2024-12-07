@@ -530,4 +530,4 @@ habitat_suitability_map("Kelp", 10,20,0,-40)
 
 ### Acknowledgments:
 
-This assignment was created by Ruth Oliver, EDS 223 - Fall 2024 Instructor.
+This assignment was created by Ruth Oliver, EDS 223 - GIS & Remote Sensing - Fall 2024 Instructor.
