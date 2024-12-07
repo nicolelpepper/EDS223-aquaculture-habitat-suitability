@@ -36,7 +36,7 @@
 ### Repo structure:
 
 ```
-EDS223-HW3
+aquaculture-habitat-suitability
 │   README.md
 │   qmd/Rmd/Proj files
 |   .gitignore
